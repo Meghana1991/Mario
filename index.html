@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        canvas {
+            border: 1px solid #d3d3d3;
+            background-color: #f1f1f1;
+        }
+
+        .footer {
+            background: #990000;
+            position: fixed;
+            bottom: 0;
+            height: 100px;
+            width: 100%;
+        }
+
+        .relative-consider {
+            position: relative;
+        }
+
+        .coin-holder div {
+            float: right;
+            background: yellow;
+            width: 50px;
+            height: 50px;
+            border: 2px solid darkgrey;
+            text-align: center;
+        }
+
+        .coin-holder {
+            position: absolute;
+            left: 200px;
+            top: 700px;
+        }
+
+        .second-set {
+            position: absolute;
+            bottom: 200px;
+            right: 800px;
+        }
+
+        .green-holder {
+            position: absolute;
+            top: 718px;
+            left: 400px;
+        }
+
+        .green-holder div {
+            width: 80px;
+            height: 80px;
+            background: green;
+        }
+
+        .steps-holder div {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background: brown;
+            position: absolute;
+            top: 788px;
+            right: 600px;
+        }
+
+        .second-step {
+            top: 740px !important;
+            right: 550px !important;
+            height: 100px !important;
+        }
+
+        .home-holder {
+            bottom: 100px;
+            background: grey;
+            position: absolute;
+            right: 10px;
+            width: 200px;
+            height: 200px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            border-top: 60px solid black;
+            border-left: 60px solid black;
+            border-right: 60px solid black;
+        }
+    </style>
+</head>
+<!--To make the game ready for action, we will update the display 50 times per second, which is much like frames in a movie.
+
+First, create a new function called updateGameArea().
+
+In the myGameArea object, add an interval which will run the updateGameArea() function every 20th millisecond (50 times per second). Also add a function called clear(), that clears the entire canvas.
+
+In the component constructor, add a function called update(), to handle the drawing of the component.
+
+The updateGameArea() function calls the clear() and the update() method.-->
+
+
+<body onload="startGame()">
+
+    <div>
+        <!-- First Coins -->
+        <div id="coins" class="coin-holder">
+            <div></div>
+            <div></div>
+        </div>
+
+        <div class="green-holder">
+            <div
+                style="border-top-left-radius:20px;border-top-right-radius:20px;border-bottom: 2px solid #e2e2e2;height: 40px;">
+            </div>
+            <div></div>
+        </div>
+    </div>
+
+    <!-- Second Coins -->
+    <div class="coin-holder second-set">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps-holder">
+        <div></div>
+        <div class="second-step"></div>
+    </div>
+
+    <!-- Home -->
+    <div class="home-holder">
+    </div>
+    <div class="footer">
+    </div>
+    </div>
+
+    <script>
+        var mario;
+        var myGameArea = {
+            canvas: document.createElement("canvas"),
+            start: function () {
+                this.canvas.width = 1870;
+                this.canvas.height = 850;
+
+                /**
+                The getContext() method returns an object that provides methods and properties for drawing on the canvas.
+                **/
+
+                this.context = this.canvas.getContext("2d");
+                document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+                this.interval = setInterval(updateGameArea, 20);
+
+                /**
+                Create a method that checks if a key is pressed, and set the key property of the myGameArea object to the key code. When the key is released, set the key property to false
+                */
+                window.addEventListener('keydown', function (e) {
+                    myGameArea.key = e.keyCode;
+                })
+                window.addEventListener('keyup', function (e) {
+                    myGameArea.key = false;
+                })
+            },
+            clear: function () {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            },
+            stop: function () {
+                clearInterval(this.interval);
+            }
+        }
+
+        function startGame() {
+            mario = new component(80, 80, "mario.png", 10, 700, "image");
+            // myObstacle  = new component(10, 200, "green", 300, 120);    
+            myObstacle = document.getElementById("coins")
+            myGameArea.start();
+        }
+
+        function component(width, height, color, x, y, type) {
+            this.width = width;
+            this.height = height;
+
+            if (type == "image") {
+                this.image = new Image();
+                this.image.src = color;
+                this.image.alt = "No";
+            }
+            /**
+            Takes Parents element context
+            */
+            this.x = x;
+            this.y = y;
+
+            /**
+            Speed
+            */
+            this.speedX = 0;
+            this.speedY = 0;
+
+            this.update = function () {
+                ctx = myGameArea.context;
+                /**
+                For Mario image icon
+                */
+                if (type == "image") {
+                    ctx.drawImage(this.image,
+                        this.x,
+                        this.y,
+                        this.width, this.height);
+                } else {
+                    /**
+                    For other simple squares
+                    */
+                    ctx.fillStyle = color;
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                }
+            }
+
+            this.newPos = function () {
+                this.x += this.speedX;
+                this.y += this.speedY;
+            }
+        }
+        /*
+                function crashWith(myObj, otherobj) {
+                    debugger
+                    var myleft = myObj.x;
+                    var myright = myObj.x + (myObj.width);
+                    var mytop = myObj.y;
+                    var mybottom = myObj.y + (myObj.height);
+                    var otherleft = otherobj.x;
+                    var otherright = otherobj.x + (otherobj.width);
+                    var othertop = otherobj.y;
+                    var otherbottom = otherobj.y + (otherobj.height);
+                    var crash = true;
+                    if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+                        crash = false;
+                    }
+                    return crash;
+                }
+        */
+        function updateGameArea() {
+            myGameArea.clear();
+            // myObstacle.update();
+            // if (crashWith(mario, myObstacle)) {
+            //     myGameArea.stop();
+            // } else {
+            // mario.x += 1;
+            mario.speedX = 0;
+            mario.speedY = 0;
+            if (myGameArea.key && myGameArea.key == 37) { mario.speedX = -10; }
+            if (myGameArea.key && myGameArea.key == 39) { mario.speedX = 10; }
+            if (myGameArea.key && myGameArea.key == 38) { mario.speedY = -10; }
+            if (myGameArea.key && myGameArea.key == 40) { mario.speedY = 10; }
+            mario.newPos();
+            mario.update();
+            // }
+        }
+
+    </script>
+</body>
+
+</html>
